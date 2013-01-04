@@ -40,4 +40,16 @@ class SmartProxy
     end
   end
 
+  get "/puppet/environments/:environment/definitions" do
+    content_type :json
+    begin
+      env = Proxy::Puppet::Environment.find(params[:environment])
+      log_halt 404, "Not found" unless env
+      env.definitions.map{|d| {d.to_s => { :name => d.name, :module => d.module, :params => d.params} } }.to_json
+    rescue => e
+      log_halt 406, "Failed to show puppet definitions: #{e}"
+    end
+  end
+
+
 end

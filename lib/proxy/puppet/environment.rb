@@ -1,6 +1,7 @@
 module Proxy::Puppet
 
   require 'proxy/puppet/puppet_class'
+  require 'proxy/puppet/puppet_definition'
   require 'puppet'
 
   class Environment
@@ -105,6 +106,10 @@ module Proxy::Puppet
 
     def classes
       paths.map {|path| PuppetClass.scan_directory path}.flatten
+    end
+
+    def definitions
+      paths.map {|path| PuppetDefinition.scan_directory path}.flatten
     end
 
   end
