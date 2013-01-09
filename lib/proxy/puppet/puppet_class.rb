@@ -13,6 +13,9 @@ module Proxy::Puppet
         parser = Puppet::Parser::Parser.new Puppet::Node::Environment.new
         # Loop over module folders.
         Dir.glob("#{directory}/*").select {|modulepath| File.directory?(modulepath) }.map do |modulepath|
+          # The foreman meta file contains additional information we want to expose.
+          module_meta = File.exists?("#{modulepath}/Moduleinfo") ? YAML.load_file("#{modulepath}/Moduleinfo") : {}
+
           Dir.glob("#{modulepath}/manifests/**/*.pp").map do |filename|
             scan_manifest File.read(filename), filename, parser
           end
@@ -49,6 +52,10 @@ module Proxy::Puppet
       end
 
       private
+      def pattern_to_regex pattern
+        return Regexp.new( pattern.gsub(/\*/, '.*?') )
+      end
+
       def ast_to_value value
         unless value.class.name.start_with? "Puppet::Parser::AST::"
           # Native Ruby types
