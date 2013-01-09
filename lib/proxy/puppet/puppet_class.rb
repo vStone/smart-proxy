@@ -26,6 +26,14 @@ module Proxy::Puppet
             end
           end.map do |filename|
             scan_manifest File.read(filename), filename, parser
+          end.flatten.reject do |klass|
+            # Remove classes that match proxy_ignore_classes[].
+            if module_meta['private_classes']
+              module_meta['private_classes'].find do |filter|
+                filter = pattern_to_regex(filter) unless filter.is_a?(Regexp)
+                filter =~ klass.to_s
+              end
+            end
           end
         end.compact.flatten
       end

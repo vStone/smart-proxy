@@ -4,3 +4,6 @@
 #
 private_files:
   - ignore_file
+private_classes:
+  - test::ignore_class
+  - test::wildcard::*
