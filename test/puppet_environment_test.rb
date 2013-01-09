@@ -29,6 +29,15 @@ class PuppetEnvironmentTest < Test::Unit::TestCase
     assert_kind_of Proxy::Puppet::PuppetClass, env.classes.first
   end
 
+  def test_an_env_should_not_have_private_files
+    env = mock_puppet_env.first
+    classnames = env.classes.map do |klass|
+      klass.to_s
+    end
+    assert_equal false, classnames.include?('test::ignore_file')
+    assert_equal true, classnames.include?('test::noignore')
+  end
+
   private
 
   def mock_puppet_env

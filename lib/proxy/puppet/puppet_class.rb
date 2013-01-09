@@ -16,7 +16,15 @@ module Proxy::Puppet
           # The foreman meta file contains additional information we want to expose.
           module_meta = File.exists?("#{modulepath}/Moduleinfo") ? YAML.load_file("#{modulepath}/Moduleinfo") : {}
 
-          Dir.glob("#{modulepath}/manifests/**/*.pp").map do |filename|
+          Dir.glob("#{modulepath}/manifests/**/*.pp").reject do |filename|
+            # Remove files that match the proxy_ignore_files[]
+            if module_meta['private_files']
+              module_meta['private_files'].find do |filter|
+                filter = pattern_to_regex(filter) unless filter.is_a?(Regexp)
+                filter =~ filename
+              end
+            end
+          end.map do |filename|
             scan_manifest File.read(filename), filename, parser
           end
         end.compact.flatten

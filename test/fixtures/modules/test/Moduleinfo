@@ -2,3 +2,5 @@
 # File contains various pieces of information on this module that
 # could be useful to external programs.
 #
+private_files:
+  - ignore_file
