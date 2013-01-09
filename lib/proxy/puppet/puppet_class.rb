@@ -11,8 +11,11 @@ module Proxy::Puppet
         # Get a Puppet Parser to parse the manifest source
         Initializer.load
         parser = Puppet::Parser::Parser.new Puppet::Node::Environment.new
-        Dir.glob("#{directory}/*/manifests/**/*.pp").map do |filename|
-          scan_manifest File.read(filename), filename, parser
+        # Loop over module folders.
+        Dir.glob("#{directory}/*").select {|modulepath| File.directory?(modulepath) }.map do |modulepath|
+          Dir.glob("#{modulepath}/manifests/**/*.pp").map do |filename|
+            scan_manifest File.read(filename), filename, parser
+          end
         end.compact.flatten
       end
 
